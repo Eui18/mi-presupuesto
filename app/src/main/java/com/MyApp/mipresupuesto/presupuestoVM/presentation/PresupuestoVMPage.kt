@@ -20,15 +20,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PresupuestoVMPage () {
+fun PresupuestoVMPage (viewModel: PresupuestoViewModel = viewModel()) {
 
     var ingreso by rememberSaveable {mutableStateOf("")}
     var basicos by rememberSaveable { mutableStateOf("") }
     var personales by rememberSaveable { mutableStateOf("")}
     var ahorro by rememberSaveable {mutableStateOf("") }
+    val restante by viewModel.restante.collectAsStateWithLifecycle()
+    val mensaje by viewModel.mensaje.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -72,14 +76,14 @@ fun PresupuestoVMPage () {
                 label = { Text("Meta de ahorro") },
                 modifier = Modifier.fillMaxWidth()
             )
-            Button(onClick = { }) {
+            Button(onClick = {viewModel.calcular(ingreso, basicos, personales, ahorro)}) {
                 Text("Calcular presupuesto")
             }
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Dinero restante")
-                    Text("$$0.00")
-                    Text("Escribe tus datos")
+                    Text("$" + String.format("%.2f", restante))
+                    Text(mensaje)
                 }
             }
         }
