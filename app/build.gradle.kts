@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.MyApp.mipresupuesto"
+    namespace = "com.miapp.mipresupuesto"
     compileSdk {
         version = release(37)
     }

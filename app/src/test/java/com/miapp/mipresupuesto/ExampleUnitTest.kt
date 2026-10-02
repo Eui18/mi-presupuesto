@@ -1,4 +1,4 @@
-package com.MyApp.mipresupuesto
+package com.miapp.mipresupuesto
 
 import org.junit.Test
 
