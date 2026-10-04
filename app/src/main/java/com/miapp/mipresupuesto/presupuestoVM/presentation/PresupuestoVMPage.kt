@@ -29,6 +29,8 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
     val compras by viewModel.compras.collectAsStateWithLifecycle()
     val cuidadoPersonal by viewModel.cuidadoPersonal.collectAsStateWithLifecycle()
     val gastoTotal by viewModel.gastoTotal.collectAsStateWithLifecycle()
+    val restante by viewModel.restante.collectAsStateWithLifecycle()
+    val mensaje by viewModel.mensaje.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
     Scaffold(
@@ -137,11 +139,12 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
                 )
             }
 
-            Button(onClick = {viewModel.calcularTotalGastos() }
+            Button(onClick = {viewModel.validarPresupuesto() }
             ){
                 Text("Calcular presupuesto")
             }
             Text("$" + gastoTotal.toString())
+            Text(mensaje)
         }
     }
 }

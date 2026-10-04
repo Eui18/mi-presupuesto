@@ -28,6 +28,10 @@ class PresupuestoViewModel : ViewModel() {
     val cuidadoPersonal: StateFlow<String> = _cuidadoPersonal.asStateFlow()
     private var _gastoTotal = MutableStateFlow(0.0)
     val gastoTotal: StateFlow<Double> = _gastoTotal.asStateFlow()
+    private var _restante = MutableStateFlow(0.0)
+    val restante: StateFlow<Double> = _restante.asStateFlow()
+    private var _mensaje = MutableStateFlow("")
+    val mensaje: StateFlow<String> = _mensaje.asStateFlow()
     fun cambiarIngreso (valorIngreso: String) {
         _ingreso.value = valorIngreso
     }
@@ -74,5 +78,20 @@ class PresupuestoViewModel : ViewModel() {
         val personalCare = cuidadoPersonal.value.toDoubleOrNull() ?: 0.0
 
         _gastoTotal.value = home + eat + transport + server + clothes + leisure + buy + personalCare
+    }
+
+    fun descontarDineroDisponible () {
+        _restante.value = disponible.value - gastoTotal.value
+        _disponible.value = restante.value
+    }
+
+    fun validarPresupuesto () {
+        calcularTotalGastos()
+        if (disponible.value >= gastoTotal.value) {
+            descontarDineroDisponible()
+            _mensaje.value = "Presupuesto aplicado correctamente"
+        } else {
+            _mensaje.value = "Tus gastos superan tu dinero disponible"
+        }
     }
 }
