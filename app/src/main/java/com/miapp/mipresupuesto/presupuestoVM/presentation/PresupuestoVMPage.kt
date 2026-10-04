@@ -1,8 +1,8 @@
 package com.miapp.mipresupuesto.presupuestoVM.presentation
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -16,74 +16,38 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
 
     val ingreso by viewModel.ingreso.collectAsStateWithLifecycle()
+    val vivienda by viewModel.vivienda.collectAsStateWithLifecycle()
+    val disponible by viewModel.disponible.collectAsStateWithLifecycle()
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
-                title = { Text("Mi presupuesto") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+            CenterAlignedTopAppBar(
+                title = {
+                    Text("Mi presupuesto")
+                }
             )
         }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            CampoDinero(
-                etiqueta = "Ingreso mensual",
-                valor = ingreso,
-                alCambiar = {
-                    viewModel.cambiarIngreso(it)
-                }
-            )
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                }
-            }
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-
+    ) {paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues)) {
+            Card(modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp))
+            {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Disponible")
+                    Text(disponible.toString())
+                    OutlinedTextField(
+                        value = ingreso,
+                        onValueChange = {nuevoValor -> viewModel.cambiarIngreso(nuevoValor)},
+                        label = {Text("Ingreso mensual")}
+                    )
+                    Button(
+                        onClick = {viewModel.agregarIngreso()}
+                    ) {
+                        Text("Agregar ingreso")
+                    }
                 }
             }
         }
     }
-}
-
-@Composable
-fun CampoDinero(etiqueta: String, valor: String, alCambiar: (String) -> Unit) {
-    OutlinedTextField(
-        value = valor,
-        onValueChange = alCambiar,
-        label = { Text(etiqueta) },
-        singleLine = true,
-        modifier = Modifier.fillMaxWidth()
-    )
 }
