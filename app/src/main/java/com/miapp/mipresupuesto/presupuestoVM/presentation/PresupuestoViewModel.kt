@@ -63,7 +63,6 @@ class PresupuestoViewModel : ViewModel() {
     fun cambiarCuidadoPersonal (valorCuidadoPersonal: String) {
         _cuidadoPersonal.value = valorCuidadoPersonal
     }
-
     fun cambiarPorcentajeAhorro (valorPorcentajeAhorro: Float) {
         _porcentajeAhorro.value = valorPorcentajeAhorro
     }
@@ -126,6 +125,8 @@ class PresupuestoViewModel : ViewModel() {
         )
         return gastos.maxOrNull() ?: 1.0
     }
-
-
+    fun obtenerProporcion (gasto: String): Float {
+        val valor = gasto.toDoubleOrNull() ?: 0.0
+        return (valor / obtenerMayorGasto()).toFloat()
+    }
 }

@@ -1,8 +1,11 @@
 package com.miapp.mipresupuesto.presupuestoVM.presentation
 
+import android.R
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -10,9 +13,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.miapp.mipresupuesto.ui.theme.FondoBlanco
+import com.miapp.mipresupuesto.ui.theme.RosaPrincipal
+import com.miapp.mipresupuesto.ui.theme.TextoPrincipal
+import com.miapp.mipresupuesto.ui.theme.TextoSecundario
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,14 +42,17 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
     val porcentajeAhorro by viewModel.porcentajeAhorro.collectAsStateWithLifecycle()
     val ahorro by viewModel.ahorro.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
-    val mayorGasto = viewModel.obtenerMayorGasto()
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text("Mi presupuesto")
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = RosaPrincipal,
+                    titleContentColor = FondoBlanco
+                )
             )
         }
     ) {paddingValues ->
@@ -50,16 +62,31 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
         ) {
             Card(modifier = Modifier
                 .fillMaxWidth()
-                .padding(5.dp))
+                .padding(horizontal = 16.dp, vertical = 12.dp))
             {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Disponible")
-                    Text(disponible.toString())
+                    Text(
+                        text = "Disponible",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = TextoSecundario
+                    )
+                    Text(
+                        text = "$${"%.2f".format(disponible)}",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = TextoPrincipal
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     OutlinedTextField(
                         value = ingreso,
-                        onValueChange = {nuevoValor -> viewModel.cambiarIngreso(nuevoValor)},
+                        onValueChange = {nuevoValor ->
+                            viewModel.cambiarIngreso(nuevoValor)},
                         label = {Text("Ingreso mensual")}
                     )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
                     Button(
                         onClick = {viewModel.agregarIngreso()}
                     ) {
@@ -67,7 +94,13 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
                     }
                 }
             }
-            Text("Gastos básicos")
+
+            Text(
+                text = "Gastos básicos",
+                style = MaterialTheme.typography.titleLarge,
+                color = TextoPrincipal,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
             Row() {
                 GastoCard(
                     modifier = Modifier.weight(1f),
@@ -85,6 +118,9 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
                     }
                 )
             }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
             Row() {
                 GastoCard(
                     modifier = Modifier.weight(1f),
@@ -103,7 +139,13 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
                     }
                 )
             }
-            Text("Gastos personales")
+            Text(
+                text = "Gastos personales",
+                style = MaterialTheme.typography.titleLarge,
+                color = TextoPrincipal,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+
+            )
             Row() {
                 GastoCard(
                     modifier = Modifier.weight(1f),
@@ -122,6 +164,9 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
                     }
                 )
             }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
             Row() {
                 GastoCard(
                     modifier = Modifier.weight(1f),
@@ -140,72 +185,141 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
                     }
                 )
             }
-            Text("Porcentaje de ahorro: ${porcentajeAhorro.toInt()}%")
-            Text("Dinero destinado al ahorro: $${"%.2f".format(ahorro)}")
-            Slider(
-                value = porcentajeAhorro,
-                onValueChange = {nuevoValor ->
-                    viewModel.cambiarPorcentajeAhorro(nuevoValor)
-                },
-                valueRange = 0f..50f,
-                steps = 49
-            )
 
-            Button(onClick = {viewModel.validarPresupuesto() }
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Ahorro",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = TextoPrincipal
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "${porcentajeAhorro.toInt()}% de mi dinero",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = TextoSecundario
+                    )
+                    Text(
+                        text = "$${"%.2f".format(ahorro)}",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = RosaPrincipal
+                    )
+                    Slider(
+                        value = porcentajeAhorro,
+                        onValueChange = {nuevoValor ->
+                            viewModel.cambiarPorcentajeAhorro(nuevoValor)
+                        },
+                        valueRange = 0f..50f,
+                        steps = 49
+                    )
+                }
+            }
+
+            Button(
+                onClick = {viewModel.validarPresupuesto() },
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
             ){
                 Text("Calcular presupuesto")
             }
-            Text("$${"%.2f".format(gastoTotal)}")
-            Text(mensaje)
 
-            Text("Gastos por categoría")
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Resumen",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = TextoPrincipal
+                    )
 
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Gastos totales",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextoSecundario
+                    )
+
+                    Text(
+                        text = "$${"%.2f".format(gastoTotal)}",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = RosaPrincipal
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = mensaje,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = TextoPrincipal
+                    )
+                }
+            }
+
+            Text(
+                text = "Gastos por categoría",
+                style = MaterialTheme.typography.titleLarge,
+                color = TextoPrincipal,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
             GastoBar(
                 text = "Vivienda",
                 valor = vivienda.toDoubleOrNull() ?: 0.0,
-                proporcion = ((vivienda.toDoubleOrNull() ?: 0.0) / mayorGasto).toFloat()
+                proporcion = viewModel.obtenerProporcion(vivienda)
             )
 
             GastoBar(
                 text = "Comida",
                 valor = comida.toDoubleOrNull() ?: 0.0,
-                proporcion = ((comida.toDoubleOrNull() ?: 0.0) / mayorGasto).toFloat()
+                proporcion = viewModel.obtenerProporcion(comida)
             )
 
             GastoBar(
                 text = "Transporte",
                 valor = transporte.toDoubleOrNull() ?: 0.0,
-                proporcion = ((transporte.toDoubleOrNull() ?: 0.0) / mayorGasto).toFloat()
+                proporcion = viewModel.obtenerProporcion(transporte)
             )
 
             GastoBar(
                 text = "Servicios",
                 valor = servicios.toDoubleOrNull() ?: 0.0,
-                proporcion = ((servicios.toDoubleOrNull() ?: 0.0) / mayorGasto).toFloat()
+                proporcion = viewModel.obtenerProporcion(servicios)
             )
 
             GastoBar(
                 text = "Ropa",
                 valor = ropa.toDoubleOrNull() ?: 0.0,
-                proporcion = ((ropa.toDoubleOrNull() ?: 0.0) / mayorGasto).toFloat()
+                proporcion = viewModel.obtenerProporcion(ropa)
             )
 
             GastoBar(
                 text = "Ocio",
                 valor = ocio.toDoubleOrNull() ?: 0.0,
-                proporcion = ((ocio.toDoubleOrNull() ?: 0.0) / mayorGasto).toFloat()
+                proporcion = viewModel.obtenerProporcion(ocio)
             )
 
             GastoBar(
                 text = "Compras",
                 valor = compras.toDoubleOrNull() ?: 0.0,
-                proporcion = ((compras.toDoubleOrNull() ?: 0.0) / mayorGasto).toFloat()
+                proporcion = viewModel.obtenerProporcion(compras)
             )
 
             GastoBar(
                 text = "Cuidado personal",
                 valor = cuidadoPersonal.toDoubleOrNull() ?: 0.0,
-                proporcion = ((cuidadoPersonal.toDoubleOrNull() ?: 0.0) / mayorGasto).toFloat()
+                proporcion = viewModel.obtenerProporcion(cuidadoPersonal)
             )
         }
     }
@@ -214,10 +328,19 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
 @Composable
 fun GastoCard (modifier: Modifier = Modifier, texto: String, valor: String, onValueChange: (String) -> Unit) {
 
-    Card(modifier = modifier.padding(16.dp)) {
-        Column(Modifier.padding(5.dp)) {
-            Text(texto)
+    Card(
+        modifier = modifier.padding(12.dp),
+    ) {
+        Column(
+            Modifier.padding(12.dp)
+        ) {
+            Text(
+                text = texto,
+                style = MaterialTheme.typography.titleMedium,
+                color = TextoPrincipal
+            )
             OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
                 value = valor,
                 onValueChange = {nuevoValor -> onValueChange (nuevoValor) },
                 label = {Text("Ingresa el gasto")}
