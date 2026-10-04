@@ -32,6 +32,10 @@ class PresupuestoViewModel : ViewModel() {
     val restante: StateFlow<Double> = _restante.asStateFlow()
     private var _mensaje = MutableStateFlow("")
     val mensaje: StateFlow<String> = _mensaje.asStateFlow()
+    private var _porcentajeAhorro = MutableStateFlow(0f)
+    val porcentajeAhorro: StateFlow<Float> = _porcentajeAhorro.asStateFlow()
+    private var _ahorro = MutableStateFlow(0.0)
+    val ahorro: StateFlow<Double> = _ahorro.asStateFlow()
     fun cambiarIngreso (valorIngreso: String) {
         _ingreso.value = valorIngreso
     }
@@ -59,6 +63,10 @@ class PresupuestoViewModel : ViewModel() {
     fun cambiarCuidadoPersonal (valorCuidadoPersonal: String) {
         _cuidadoPersonal.value = valorCuidadoPersonal
     }
+
+    fun cambiarPorcentajeAhorro (valorPorcentajeAhorro: Float) {
+        _porcentajeAhorro.value = valorPorcentajeAhorro
+    }
     fun agregarIngreso () {
         val cantidad = ingreso.value.toDoubleOrNull()
 
@@ -66,7 +74,6 @@ class PresupuestoViewModel : ViewModel() {
             _disponible.value = disponible.value + cantidad
         }
     }
-
     fun calcularTotalGastos () {
         val home = vivienda.value.toDoubleOrNull() ?: 0.0
         val eat = comida.value.toDoubleOrNull() ?: 0.0
@@ -79,19 +86,46 @@ class PresupuestoViewModel : ViewModel() {
 
         _gastoTotal.value = home + eat + transport + server + clothes + leisure + buy + personalCare
     }
-
     fun descontarDineroDisponible () {
-        _restante.value = disponible.value - gastoTotal.value
+        _restante.value = disponible.value - gastoTotal.value - ahorro.value
         _disponible.value = restante.value
     }
-
     fun validarPresupuesto () {
         calcularTotalGastos()
-        if (disponible.value >= gastoTotal.value) {
+        calcularAhorro()
+        if (disponible.value >= gastoTotal.value + ahorro.value) {
             descontarDineroDisponible()
             _mensaje.value = "Presupuesto aplicado correctamente"
         } else {
             _mensaje.value = "Tus gastos superan tu dinero disponible"
         }
     }
+    fun calcularAhorro () {
+        _ahorro.value = disponible.value * porcentajeAhorro.value.toDouble() / 100
+    }
+
+    fun obtenerMayorGasto(): Double{
+        val home = vivienda.value.toDoubleOrNull() ?: 0.0
+        val eat = comida.value.toDoubleOrNull() ?: 0.0
+        val transport = transporte.value.toDoubleOrNull() ?: 0.0
+        val server = servicios.value.toDoubleOrNull() ?: 0.0
+        val clothes = ropa.value.toDoubleOrNull() ?: 0.0
+        val leisure = ocio.value.toDoubleOrNull() ?: 0.0
+        val buy = compras.value.toDoubleOrNull() ?: 0.0
+        val personalCare = cuidadoPersonal.value.toDoubleOrNull() ?: 0.0
+
+        val gastos = listOf(
+            home,
+            eat,
+            transport,
+            server,
+            clothes,
+            leisure,
+            buy,
+            personalCare
+        )
+        return gastos.maxOrNull() ?: 1.0
+    }
+
+
 }

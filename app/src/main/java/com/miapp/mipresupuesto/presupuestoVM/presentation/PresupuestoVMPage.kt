@@ -29,9 +29,11 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
     val compras by viewModel.compras.collectAsStateWithLifecycle()
     val cuidadoPersonal by viewModel.cuidadoPersonal.collectAsStateWithLifecycle()
     val gastoTotal by viewModel.gastoTotal.collectAsStateWithLifecycle()
-    val restante by viewModel.restante.collectAsStateWithLifecycle()
     val mensaje by viewModel.mensaje.collectAsStateWithLifecycle()
+    val porcentajeAhorro by viewModel.porcentajeAhorro.collectAsStateWithLifecycle()
+    val ahorro by viewModel.ahorro.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
+    val mayorGasto = viewModel.obtenerMayorGasto()
 
     Scaffold(
         topBar = {
@@ -138,13 +140,73 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
                     }
                 )
             }
+            Text("Porcentaje de ahorro: ${porcentajeAhorro.toInt()}%")
+            Text("Dinero destinado al ahorro: $${"%.2f".format(ahorro)}")
+            Slider(
+                value = porcentajeAhorro,
+                onValueChange = {nuevoValor ->
+                    viewModel.cambiarPorcentajeAhorro(nuevoValor)
+                },
+                valueRange = 0f..50f,
+                steps = 49
+            )
 
             Button(onClick = {viewModel.validarPresupuesto() }
             ){
                 Text("Calcular presupuesto")
             }
-            Text("$" + gastoTotal.toString())
+            Text("$${"%.2f".format(gastoTotal)}")
             Text(mensaje)
+
+            Text("Gastos por categoría")
+
+            GastoBar(
+                text = "Vivienda",
+                valor = vivienda.toDoubleOrNull() ?: 0.0,
+                proporcion = ((vivienda.toDoubleOrNull() ?: 0.0) / mayorGasto).toFloat()
+            )
+
+            GastoBar(
+                text = "Comida",
+                valor = comida.toDoubleOrNull() ?: 0.0,
+                proporcion = ((comida.toDoubleOrNull() ?: 0.0) / mayorGasto).toFloat()
+            )
+
+            GastoBar(
+                text = "Transporte",
+                valor = transporte.toDoubleOrNull() ?: 0.0,
+                proporcion = ((transporte.toDoubleOrNull() ?: 0.0) / mayorGasto).toFloat()
+            )
+
+            GastoBar(
+                text = "Servicios",
+                valor = servicios.toDoubleOrNull() ?: 0.0,
+                proporcion = ((servicios.toDoubleOrNull() ?: 0.0) / mayorGasto).toFloat()
+            )
+
+            GastoBar(
+                text = "Ropa",
+                valor = ropa.toDoubleOrNull() ?: 0.0,
+                proporcion = ((ropa.toDoubleOrNull() ?: 0.0) / mayorGasto).toFloat()
+            )
+
+            GastoBar(
+                text = "Ocio",
+                valor = ocio.toDoubleOrNull() ?: 0.0,
+                proporcion = ((ocio.toDoubleOrNull() ?: 0.0) / mayorGasto).toFloat()
+            )
+
+            GastoBar(
+                text = "Compras",
+                valor = compras.toDoubleOrNull() ?: 0.0,
+                proporcion = ((compras.toDoubleOrNull() ?: 0.0) / mayorGasto).toFloat()
+            )
+
+            GastoBar(
+                text = "Cuidado personal",
+                valor = cuidadoPersonal.toDoubleOrNull() ?: 0.0,
+                proporcion = ((cuidadoPersonal.toDoubleOrNull() ?: 0.0) / mayorGasto).toFloat()
+            )
         }
     }
 }
@@ -161,5 +223,18 @@ fun GastoCard (modifier: Modifier = Modifier, texto: String, valor: String, onVa
                 label = {Text("Ingresa el gasto")}
             )
         }
+    }
+}
+
+@Composable
+fun GastoBar (text: String, valor: Double, proporcion: Float) {
+    Column {
+        Row {
+            Text(text)
+            Text("$${"%.2f".format(valor)}")
+        }
+        LinearProgressIndicator(
+            progress = { proporcion }
+        )
     }
 }
