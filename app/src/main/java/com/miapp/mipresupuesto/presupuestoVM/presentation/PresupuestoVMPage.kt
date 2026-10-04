@@ -4,7 +4,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.paddingFrom
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,6 +24,12 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
     val comida by viewModel.comida.collectAsStateWithLifecycle()
     val transporte by viewModel.transporte.collectAsStateWithLifecycle()
     val servicios by viewModel.servicios.collectAsStateWithLifecycle()
+    val ropa by viewModel.ropa.collectAsStateWithLifecycle()
+    val ocio by viewModel.ocio.collectAsStateWithLifecycle()
+    val compras by viewModel.compras.collectAsStateWithLifecycle()
+    val cuidadoPersonal by viewModel.cuidadoPersonal.collectAsStateWithLifecycle()
+    val gastoTotal by viewModel.gastoTotal.collectAsStateWithLifecycle()
+    val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
@@ -33,7 +40,10 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
             )
         }
     ) {paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
+        Column(modifier = Modifier
+            .padding(paddingValues)
+            .verticalScroll(scrollState)
+        ) {
             Card(modifier = Modifier
                 .fillMaxWidth()
                 .padding(5.dp))
@@ -61,13 +71,15 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
                     valor = vivienda,
                     onValueChange = {nuevoValor ->
                         viewModel.cambiarVivienda(nuevoValor)
-                    })
+                    }
+                )
                 GastoCard(modifier = Modifier.weight(1f),
                     texto = "Comida",
                     valor = comida,
                     onValueChange = {nuevoValor ->
                         viewModel.cambiarComida(nuevoValor)
-                    })
+                    }
+                )
             }
             Row() {
                 GastoCard(
@@ -76,16 +88,60 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
                     valor =transporte,
                     onValueChange = {nuevoValor ->
                         viewModel.cambiarTransporte(nuevoValor)
-                    })
+                    }
+                )
                 GastoCard(
                     modifier = Modifier.weight(1f),
                     texto = "Servicios",
                     valor = servicios,
                     onValueChange = {nuevoValor ->
                         viewModel.cambiarServicios(nuevoValor)
-                    })
+                    }
+                )
+            }
+            Text("Gastos personales")
+            Row() {
+                GastoCard(
+                    modifier = Modifier.weight(1f),
+                    texto = "Ropa",
+                    valor = ropa,
+                    onValueChange = {nuevoValor ->
+                        viewModel.cambiarRopa(nuevoValor)
+                    }
+                )
+                GastoCard(
+                    modifier = Modifier.weight(1f),
+                    texto = "Ocio",
+                    valor = ocio,
+                    onValueChange = { nuevoValor ->
+                        viewModel.cambiarOcio(nuevoValor)
+                    }
+                )
+            }
+            Row() {
+                GastoCard(
+                    modifier = Modifier.weight(1f),
+                    texto = "Compras",
+                    valor = compras,
+                    onValueChange = { nuevoValor ->
+                        viewModel.cambiarCompras(nuevoValor)
+                    }
+                )
+                GastoCard(
+                    modifier = Modifier.weight(1f),
+                    texto = "Cuidado personal",
+                    valor = cuidadoPersonal,
+                    onValueChange = {nuevoValor ->
+                        viewModel.cambiarCuidadoPersonal(nuevoValor)
+                    }
+                )
             }
 
+            Button(onClick = {viewModel.calcularTotalGastos() }
+            ){
+                Text("Calcular presupuesto")
+            }
+            Text("$" + gastoTotal.toString())
         }
     }
 }
