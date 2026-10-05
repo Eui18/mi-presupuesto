@@ -14,18 +14,10 @@ class PresupuestoViewModel : ViewModel() {
     val disponible: StateFlow<Double> = _disponible.asStateFlow()
     private var _comida = MutableStateFlow("")
     val comida: StateFlow<String> = _comida.asStateFlow()
-    private var _transporte = MutableStateFlow("")
-    val transporte: StateFlow<String> = _transporte.asStateFlow()
-    private var _servicios = MutableStateFlow("")
-    val servicios: StateFlow<String> = _servicios.asStateFlow()
-    private var _ropa = MutableStateFlow("")
-    val ropa: StateFlow<String> = _ropa.asStateFlow()
     private var _ocio = MutableStateFlow("")
     val ocio: StateFlow<String> = _ocio.asStateFlow()
     private var _compras = MutableStateFlow("")
     val compras: StateFlow<String> = _compras.asStateFlow()
-    private var _cuidadoPersonal = MutableStateFlow("")
-    val cuidadoPersonal: StateFlow<String> = _cuidadoPersonal.asStateFlow()
     private var _gastoTotal = MutableStateFlow(0.0)
     val gastoTotal: StateFlow<Double> = _gastoTotal.asStateFlow()
     private var _restante = MutableStateFlow(0.0)
@@ -45,23 +37,11 @@ class PresupuestoViewModel : ViewModel() {
     fun cambiarComida (valorComida: String) {
         _comida.value = valorComida
     }
-    fun cambiarTransporte (valorTransporte: String) {
-        _transporte.value = valorTransporte
-    }
-    fun cambiarServicios (valorServicios: String ) {
-        _servicios.value = valorServicios
-    }
-    fun cambiarRopa (valorRopa: String) {
-        _ropa.value = valorRopa
-    }
     fun cambiarOcio (valorOcio: String) {
         _ocio.value = valorOcio
     }
     fun cambiarCompras (valorCompras: String) {
         _compras.value = valorCompras
-    }
-    fun cambiarCuidadoPersonal (valorCuidadoPersonal: String) {
-        _cuidadoPersonal.value = valorCuidadoPersonal
     }
     fun cambiarPorcentajeAhorro (valorPorcentajeAhorro: Float) {
         _porcentajeAhorro.value = valorPorcentajeAhorro
@@ -69,64 +49,62 @@ class PresupuestoViewModel : ViewModel() {
     fun agregarIngreso () {
         val cantidad = ingreso.value.toDoubleOrNull()
 
-        if (cantidad != null) {
+        if (cantidad != null && cantidad > 0) {
             _disponible.value = disponible.value + cantidad
+            _ingreso.value = ""
+            _mensaje.value = "Ingresado correctamente"
+        } else {
+            _mensaje.value = "Ingresa una cantidad válida"
         }
     }
     fun calcularTotalGastos () {
         val home = vivienda.value.toDoubleOrNull() ?: 0.0
         val eat = comida.value.toDoubleOrNull() ?: 0.0
-        val transport = transporte.value.toDoubleOrNull() ?: 0.0
-        val server = servicios.value.toDoubleOrNull() ?: 0.0
-        val clothes = ropa.value.toDoubleOrNull() ?: 0.0
         val leisure = ocio.value.toDoubleOrNull() ?: 0.0
         val buy = compras.value.toDoubleOrNull() ?: 0.0
-        val personalCare = cuidadoPersonal.value.toDoubleOrNull() ?: 0.0
 
-        _gastoTotal.value = home + eat + transport + server + clothes + leisure + buy + personalCare
+        _gastoTotal.value = home + eat + leisure + buy
     }
-    fun descontarDineroDisponible () {
-        _restante.value = disponible.value - gastoTotal.value - ahorro.value
-        _disponible.value = restante.value
-    }
-    fun validarPresupuesto () {
+    fun calcularPresupuesto (): Boolean {
         calcularTotalGastos()
         calcularAhorro()
-        if (disponible.value >= gastoTotal.value + ahorro.value) {
-            descontarDineroDisponible()
-            _mensaje.value = "Presupuesto aplicado correctamente"
+        _restante.value = disponible.value - gastoTotal.value - ahorro.value
+
+        if (disponible.value > 0 && restante.value >= 0) {
+            _mensaje.value = "Tu presupuesto es posible"
+            return true
         } else {
-            _mensaje.value = "Tus gastos superan tu dinero disponible"
+            _mensaje.value = "Revisa tus gastos o tu dinero disponible"
+            return false
         }
     }
     fun calcularAhorro () {
         _ahorro.value = disponible.value * porcentajeAhorro.value.toDouble() / 100
     }
 
+    fun aplicarPresupuesto () {
+        if (calcularPresupuesto()) {
+            _disponible.value = restante.value
+            _mensaje.value = "Presupuesto aplicado correctamente"
+        }
+    }
     fun obtenerMayorGasto(): Double{
-        val home = vivienda.value.toDoubleOrNull() ?: 0.0
-        val eat = comida.value.toDoubleOrNull() ?: 0.0
-        val transport = transporte.value.toDoubleOrNull() ?: 0.0
-        val server = servicios.value.toDoubleOrNull() ?: 0.0
-        val clothes = ropa.value.toDoubleOrNull() ?: 0.0
-        val leisure = ocio.value.toDoubleOrNull() ?: 0.0
-        val buy = compras.value.toDoubleOrNull() ?: 0.0
-        val personalCare = cuidadoPersonal.value.toDoubleOrNull() ?: 0.0
 
         val gastos = listOf(
-            home,
-            eat,
-            transport,
-            server,
-            clothes,
-            leisure,
-            buy,
-            personalCare
+            vivienda.value.toDoubleOrNull() ?: 0.0,
+            comida.value.toDoubleOrNull() ?: 0.0,
+            ocio.value.toDoubleOrNull() ?: 0.0,
+            compras.value.toDoubleOrNull() ?: 0.0
         )
-        return gastos.maxOrNull() ?: 1.0
+        return gastos.maxOrNull() ?: 0.0
     }
     fun obtenerProporcion (gasto: String): Float {
         val valor = gasto.toDoubleOrNull() ?: 0.0
-        return (valor / obtenerMayorGasto()).toFloat()
+        val mayorGasto = obtenerMayorGasto()
+
+        if (mayorGasto == 0.0) {
+            return 0f
+        }
+        return (valor / mayorGasto).toFloat()
     }
 }
