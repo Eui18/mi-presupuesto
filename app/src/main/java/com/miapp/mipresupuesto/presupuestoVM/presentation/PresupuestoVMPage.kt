@@ -1,24 +1,18 @@
 package com.miapp.mipresupuesto.presupuestoVM.presentation
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.miapp.mipresupuesto.ui.theme.FondoBlanco
-import com.miapp.mipresupuesto.ui.theme.RosaPrincipal
-import com.miapp.mipresupuesto.ui.theme.TextoPrincipal
-import com.miapp.mipresupuesto.ui.theme.TextoSecundario
+import com.miapp.mipresupuesto.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,54 +28,52 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
     val mensaje by viewModel.mensaje.collectAsStateWithLifecycle()
     val porcentajeAhorro by viewModel.porcentajeAhorro.collectAsStateWithLifecycle()
     val ahorro by viewModel.ahorro.collectAsStateWithLifecycle()
-    val scrollState = rememberScrollState()
+    val restante by viewModel.restante.collectAsStateWithLifecycle()
 
     Scaffold(
+        containerColor = RosaFondoSuave,
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    Text("Mi presupuesto")
-                },
+                title = { Text("Mi presupuesto", fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = RosaPrincipal,
                     titleContentColor = FondoBlanco
                 )
             )
         }
-    ) {paddingValues ->
-        Column(modifier = Modifier
-            .padding(paddingValues)
-            .verticalScroll(scrollState)
-        ) {
-            Card(modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp))
-            {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Disponible",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = TextoSecundario
-                    )
-                    Text(
-                        text = "$${"%.2f".format(disponible)}",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = TextoPrincipal
-                    )
+    ) { paddingValues ->
 
-                    Spacer(modifier = Modifier.height(12.dp))
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 20.dp)
+        ) {
+
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                colors = CardDefaults.cardColors(RosaTarjeta)
+            ) {
+                Column(Modifier.padding(18.dp)) {
+                    Text("Disponible", style = MaterialTheme.typography.labelMedium, color = TextoSecundario)
+                    Text(
+                        "$${"%.2f".format(disponible)}",
+                        style = MaterialTheme.typography.headlineLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = RosaPrincipal
+                    )
 
                     OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
                         value = ingreso,
-                        onValueChange = {nuevoValor ->
-                            viewModel.cambiarIngreso(nuevoValor)},
-                        label = {Text("Ingreso mensual")}
+                        onValueChange = { viewModel.cambiarIngreso(it) },
+                        label = { Text("Ingreso mensual") }
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
                     Button(
-                        onClick = {viewModel.agregarIngreso()}
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { viewModel.agregarIngreso() },
+                        colors = ButtonDefaults.buttonColors(RosaPrincipal)
                     ) {
                         Text("Agregar ingreso")
                     }
@@ -89,204 +81,214 @@ fun PresupuestoVMPage(viewModel: PresupuestoViewModel = viewModel()) {
             }
 
             Text(
-                text = "Gastos básicos",
-                style = MaterialTheme.typography.titleLarge,
-                color = TextoPrincipal,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                "Mis gastos",
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = TextoPrincipal
             )
-            Row() {
+
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 GastoCard(
-                    modifier = Modifier.weight(1f),
-                    texto = "Vivienda",
-                    valor = vivienda,
-                    onValueChange = {nuevoValor ->
-                        viewModel.cambiarVivienda(nuevoValor)
-                    }
-                )
-                GastoCard(modifier = Modifier.weight(1f),
-                    texto = "Comida",
-                    valor = comida,
-                    onValueChange = {nuevoValor ->
-                        viewModel.cambiarComida(nuevoValor)
-                    }
-                )
+                    Modifier.weight(1f), "Vivienda", vivienda, ColorVivienda
+                ) { viewModel.cambiarVivienda(it) }
+
+                GastoCard(
+                    Modifier.weight(1f), "Comida", comida, ColorComida
+                ) { viewModel.cambiarComida(it) }
             }
 
-            Text(
-                text = "Gastos personales",
-                style = MaterialTheme.typography.titleLarge,
-                color = TextoPrincipal,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                GastoCard(
+                    Modifier.weight(1f), "Compras", compras, ColorCompras
+                ) { viewModel.cambiarCompras(it) }
 
-            )
-            Row() {
                 GastoCard(
-                    modifier = Modifier.weight(1f),
-                    texto = "Compras",
-                    valor = compras,
-                    onValueChange = { nuevoValor ->
-                        viewModel.cambiarCompras(nuevoValor)
-                    }
-                )
-                GastoCard(
-                    modifier = Modifier.weight(1f),
-                    texto = "Ocio",
-                    valor = ocio,
-                    onValueChange = { nuevoValor ->
-                        viewModel.cambiarOcio(nuevoValor)
-                    }
-                )
+                    Modifier.weight(1f), "Ocio", ocio, ColorOcio
+                ) { viewModel.cambiarOcio(it) }
             }
 
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                colors = CardDefaults.cardColors(RosaAhorro)
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        text = "Ahorro",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = TextoPrincipal
-                    )
+                Column(Modifier.padding(18.dp)) {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Ahorro", style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold, color = RosaPrincipal)
+                        Text("${porcentajeAhorro.toInt()}%",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold, color = RosaPrincipal)
+                    }
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
                     Text(
-                        text = "${porcentajeAhorro.toInt()}% de mi dinero",
-                        style = MaterialTheme.typography.bodyLarge,
+                        "Apartarás $${"%.2f".format(disponible * porcentajeAhorro / 100)}",
+                        style = MaterialTheme.typography.bodyMedium,
                         color = TextoSecundario
                     )
-                    Text(
-                        text = "$${"%.2f".format(ahorro)}",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = RosaPrincipal
-                    )
+
                     Slider(
                         value = porcentajeAhorro,
-                        onValueChange = {nuevoValor ->
-                            viewModel.cambiarPorcentajeAhorro(nuevoValor)
-                        },
+                        onValueChange = { viewModel.cambiarPorcentajeAhorro(it) },
                         valueRange = 0f..50f,
-                        steps = 49
+                        steps = 49,
+                        colors = SliderDefaults.colors(
+                            thumbColor = RosaPrincipal,
+                            activeTickColor = RosaPrincipal,
+                            inactiveTickColor = RosaBarra
+                        )
                     )
                 }
             }
 
             Button(
-                onClick = {viewModel.calcularPresupuesto() },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-            ){
-                Text("Calcular presupuesto")
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                onClick = { viewModel.calcularPresupuesto() },
+                colors = ButtonDefaults.buttonColors(RosaPrincipal)
+            ) {
+                Text("Calcular presupuesto", fontWeight = FontWeight.Bold)
             }
 
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                colors = CardDefaults.cardColors(FondoBlanco)
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
+                Column(Modifier.padding(18.dp)) {
                     Text(
-                        text = "Resumen",
-                        style = MaterialTheme.typography.titleLarge,
+                        "Resumen",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
                         color = TextoPrincipal
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    FilaResumen("Gastos totales", gastoTotal, TextoPrincipal)
+                    FilaResumen("Ahorro", ahorro, RosaPrincipal)
+                    FilaResumen("Dinero restante", restante, VerdeExito)
+
+                    Card(colors = CardDefaults.cardColors(VerdeSuave)) {
+                        Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                            Text(
+                                "Tu gasto diario aproximado",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = VerdeExito
+                            )
+                            Text(
+                                "$${"%.2f".format(restante / 30.0)} al día",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = VerdeExito
+                            )
+                        }
+                    }
 
                     Text(
-                        text = "Gastos totales",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = TextoSecundario
-                    )
-
-                    Text(
-                        text = "$${"%.2f".format(gastoTotal)}",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = RosaPrincipal
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = mensaje,
+                        mensaje,
+                        modifier = Modifier.padding(top = 10.dp),
                         style = MaterialTheme.typography.bodyLarge,
                         color = TextoPrincipal
                     )
                 }
             }
 
+            Button(
+                onClick = { viewModel.aplicarPresupuesto() },
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+            ) {
+                Text("Aplicar presupuesto")
+            }
+
             Text(
-                text = "Gastos por categoría",
+                "Gastos por categoría",
                 style = MaterialTheme.typography.titleLarge,
                 color = TextoPrincipal,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-            GastoBar(
-                text = "Vivienda",
-                valor = vivienda.toDoubleOrNull() ?: 0.0,
-                proporcion = viewModel.obtenerProporcion(vivienda)
+                modifier = Modifier.padding(16.dp)
             )
 
-            GastoBar(
-                text = "Comida",
-                valor = comida.toDoubleOrNull() ?: 0.0,
-                proporcion = viewModel.obtenerProporcion(comida)
-            )
-
-            GastoBar(
-                text = "Ocio",
-                valor = ocio.toDoubleOrNull() ?: 0.0,
-                proporcion = viewModel.obtenerProporcion(ocio)
-            )
-
-            GastoBar(
-                text = "Compras",
-                valor = compras.toDoubleOrNull() ?: 0.0,
-                proporcion = viewModel.obtenerProporcion(compras)
-            )
-
+            GastoBar("Vivienda", vivienda.toDoubleOrNull() ?: 0.0,
+                viewModel.obtenerProporcion(vivienda), ColorVivienda)
+            GastoBar("Comida", comida.toDoubleOrNull() ?: 0.0,
+                viewModel.obtenerProporcion(comida), ColorComida)
+            GastoBar("Ocio", ocio.toDoubleOrNull() ?: 0.0,
+                viewModel.obtenerProporcion(ocio), ColorOcio)
+            GastoBar("Compras", compras.toDoubleOrNull() ?: 0.0,
+                viewModel.obtenerProporcion(compras), ColorCompras)
         }
     }
 }
 
 @Composable
-fun GastoCard (modifier: Modifier = Modifier, texto: String, valor: String, onValueChange: (String) -> Unit) {
-
+fun GastoCard(
+    modifier: Modifier = Modifier,
+    texto: String,
+    valor: String,
+    color: Color,
+    onValueChange: (String) -> Unit
+) {
     Card(
-        modifier = modifier.padding(12.dp)
+        modifier = modifier.padding(4.dp),
+        colors = CardDefaults.cardColors(FondoBlanco)
     ) {
-        Column(
-            Modifier.padding(12.dp)
-        ) {
-            Text(
-                text = texto,
-                style = MaterialTheme.typography.titleMedium,
-                color = TextoPrincipal
-            )
+        Column(Modifier.padding(10.dp)) {
+            Text(texto, style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold, color = color)
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = valor,
-                onValueChange = {nuevoValor -> onValueChange (nuevoValor) },
-                label = {Text("Ingresa el gasto")}
+                onValueChange = onValueChange,
+                label = { Text("Cantidad") }
             )
         }
     }
 }
 
 @Composable
-fun GastoBar (text: String, valor: Double, proporcion: Float) {
-    Column {
-        Row {
-            Text(text)
-            Text("$${"%.2f".format(valor)}")
+fun GastoBar(text: String, valor: Double, proporcion: Float, color: Color) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 5.dp),
+        colors = CardDefaults.cardColors(FondoBlanco)
+    ) {
+        Column(Modifier.padding(14.dp)) {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(text, style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold, color = color)
+                Text("$${"%.2f".format(valor)}",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold, color = TextoPrincipal)
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            LinearProgressIndicator(
+                progress = { proporcion },
+                modifier = Modifier.fillMaxWidth().height(8.dp),
+                color = color
+            )
         }
-        LinearProgressIndicator(
-            progress = { proporcion }
-        )
+    }
+}
+
+@Composable
+fun FilaResumen(titulo: String, cantidad: Double, color: Color) {
+    Row(
+        Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(titulo, color = TextoSecundario,
+            style = MaterialTheme.typography.bodyLarge)
+        Text("$${"%.2f".format(cantidad)}", color = color,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold)
     }
 }

@@ -25,3 +25,10 @@ val ColorRopa = Color(0xFF64B5F6)
 val ColorOcio = RosaPrincipal
 val ColorCompras = Color(0xFF4DB6AC)
 val ColorCuidado = Color(0xFFF06292)
+
+//colores de apoyo
+val RosaTarjeta = Color(0xFFF9E8F0)
+val RosaAhorro = Color(0xFFFCECF3)
+val VerdeSuave = Color(0xFFE4F3E6)
+val RosaBorde = Color(0xFFF0DCE5)
+val RosaBarra = Color(0xFFE9C8D8)
