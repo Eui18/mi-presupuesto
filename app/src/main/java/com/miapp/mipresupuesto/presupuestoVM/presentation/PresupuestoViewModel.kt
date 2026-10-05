@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-
 class PresupuestoViewModel : ViewModel() {
     private var _ingreso = MutableStateFlow("")
     val ingreso: StateFlow<String> = _ingreso.asStateFlow()
@@ -28,6 +27,12 @@ class PresupuestoViewModel : ViewModel() {
     val porcentajeAhorro: StateFlow<Float> = _porcentajeAhorro.asStateFlow()
     private var _ahorro = MutableStateFlow(0.0)
     val ahorro: StateFlow<Double> = _ahorro.asStateFlow()
+    private var _nombre = MutableStateFlow("Violeta")
+    val nombre: StateFlow<String> = _nombre.asStateFlow()
+    private var _matricula = MutableStateFlow(253458)
+    val matricula: StateFlow<Int> = _matricula.asStateFlow()
+    private val _mostrarPerfil = MutableStateFlow(false)
+    val mostrarPerfil = _mostrarPerfil.asStateFlow()
     fun cambiarIngreso (valorIngreso: String) {
         _ingreso.value = valorIngreso
     }
@@ -106,5 +111,11 @@ class PresupuestoViewModel : ViewModel() {
             return 0f
         }
         return (valor / mayorGasto).toFloat()
+    }
+
+    fun mostrarPerfil (nombre: String, matricula: Int) {
+        _nombre.value = nombre
+        _matricula.value = matricula
+        _mostrarPerfil.value = true
     }
 }

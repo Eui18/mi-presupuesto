@@ -19,12 +19,8 @@ val FondoBlanco = Color(0xFFFFFFFF)
 // colores de categorías
 val ColorVivienda = Color(0xFF8D6E63)
 val ColorComida = Color(0xFFFFB74D)
-val ColorTransporte = Color(0xFF90A4AE)
-val ColorServicios = Color(0xFFBA68C8)
-val ColorRopa = Color(0xFF64B5F6)
 val ColorOcio = RosaPrincipal
 val ColorCompras = Color(0xFF4DB6AC)
-val ColorCuidado = Color(0xFFF06292)
 
 //colores de apoyo
 val RosaTarjeta = Color(0xFFF9E8F0)
